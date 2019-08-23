@@ -6,7 +6,8 @@ public class Player : MonoBehaviour
 {
     Rigidbody2D rb;
     GameManager gameManager;
-    public GameObject death_part;
+    public GameObject deathPart;
+    public GameObject itemPickupPart;
 
     float angle = 0;
     int playerXSpeed = 3;
@@ -18,8 +19,7 @@ public class Player : MonoBehaviour
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
-
-    void Update() {
+    void FixedUpdate() {
         if(IsDead) return;
         PlayerMove();
         GetInput();
@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
         }
         else {
             if (rb.velocity.y > 0) {
-                rb.AddForce(new Vector2(0, -playerYSpeed));
+                rb.AddForce(new Vector2(0, -playerYSpeed / 2));
             }
             else {
                 rb.velocity = new Vector2(rb.velocity.x, 0);
@@ -48,17 +48,20 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) {
         if(other.gameObject.tag == "Obstacle") {
-            Destroy(Instantiate(death_part, this.transform.position, Quaternion.identity), 1f);
-            PlayerDead();
-            gameManager.PlayerDead();
-        } else if(other.gameObject.tag == "Item") {
-            Debug.Log("You picked item!");
+            PlayerDeath();
+        } else if(other.gameObject.tag == "CollectableItem") {
+            Debug.Log("You picked Collectable Item!");
+            Destroy(Instantiate(itemPickupPart, other.gameObject.transform.position, Quaternion.identity), 1f);
+            Destroy(other.gameObject.transform.parent.gameObject);
+            gameManager.AddPoints();
         }
     }
 
-    void PlayerDead() {
+    void PlayerDeath() {
+        Destroy(Instantiate(deathPart, this.transform.position, Quaternion.identity), 1f);
         IsDead = true;
         rb.isKinematic = true;
         rb.velocity = new Vector2(0 , 0);
+        gameManager.PlayerDead();
     }
 }

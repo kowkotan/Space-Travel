@@ -6,11 +6,11 @@ public class CameraFollow : MonoBehaviour
 {
 
     public GameObject playerObj;
-    float smoothTime = 0.3f;
+    float smoothTime = 0.15f;
     Vector3 velocity = Vector3.zero;
     int yOfsset = 11;
 
-    void Update()
+    void FixedUpdate()
     {
         PlayerFollow();    
     }
